@@ -1,0 +1,48 @@
+.user-list {
+  padding: 1em 0;
+}
+
+.user-list h3 {
+  margin-top: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.user-list .message {
+  color: #16a34a;
+  margin: 0.5em 0;
+  font-weight: 500;
+}
+
+.user-list .add-button {
+  margin: 8px 8px 8px 0;
+}
+
+.user-list table {
+  margin-top: 8px;
+}
+
+.user-list th:nth-child(1),
+.user-list td:nth-child(1) {
+  width: 28%;
+}
+
+.user-list th:nth-child(2),
+.user-list td:nth-child(2) {
+  width: 34%;
+}
+
+.user-list th:nth-child(3),
+.user-list td:nth-child(3) {
+  width: 14%;
+}
+
+.user-list th:nth-child(4),
+.user-list td:nth-child(4) {
+  width: 24%;
+}
+
+.actions-column {
+  text-align: right;
+}

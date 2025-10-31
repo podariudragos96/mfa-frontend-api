@@ -1,0 +1,14 @@
+.row { display:flex; gap:12px; align-items:center; margin:8px 0; }
+.row label { width:140px; color:#6b7280; }
+select, input { flex:1; height:36px; padding:6px 10px; border:1px solid #e5e7eb; border-radius:8px; }
+select:focus, input:focus { outline:none; border-color:#2563eb; }
+.divider { height:1px; background:#e5e7eb; margin:12px 0; }
+
+.btn { height:36px; padding:0 14px; border:1px solid #e5e7eb; border-radius:8px; background:#fff; cursor:pointer; }
+.btn:hover { background:#f3f4f6; }
+.btn.primary { background:#2563eb; border-color:#2563eb; color:#fff; }
+.btn.primary:hover { background:#1d4ed8; border-color:#1d4ed8; }
+.btn.danger { background:#dc2626; border-color:#dc2626; color:#fff; }
+.btn.danger:hover { background:#b91c1c; border-color:#b91c1c; }
+
+.hint { color:#6b7280; }

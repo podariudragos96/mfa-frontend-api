@@ -1,0 +1,53 @@
+<header class="appbar">
+  <div class="appbar-inner">
+    <h1>DEMO MFA Proof Of Concept APP</h1>
+    <nav class="tabs">
+      <button class="tab" [class.active]="view==='admin'" (click)="switchView('admin')">Admin console</button>
+      <button class="tab" [class.active]="view==='user'" (click)="switchView('user')">User login</button>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+  <!-- ADMIN TAB -->
+  <ng-container *ngIf="view==='admin'">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Realm management</h3>
+      </div>
+      <div class="card-body">
+        <!-- Admin mode: picker + create/delete -->
+        <app-realm-selector [mode]="'admin'" (realmSelected)="onRealmSelected($event)"></app-realm-selector>
+      </div>
+    </div>
+
+    <div class="card" *ngIf="selectedRealm; else noRealmYet">
+      <div class="card-header"><h3 class="card-title">Users in {{ selectedRealm?.name }}</h3></div>
+      <div class="card-body">
+        <app-user-list [realm]="selectedRealm!"></app-user-list>
+      </div>
+    </div>
+    <ng-template #noRealmYet>
+      <div class="card"><div class="card-body">Select a realm above to manage users.</div></div>
+    </ng-template>
+  </ng-container>
+
+  <!-- USER TAB -->
+  <ng-container *ngIf="view==='user'">
+    <div class="card">
+      <div class="card-header"><h3 class="card-title">Choose your realm</h3></div>
+      <div class="card-body">
+        <!-- Picker-only (no create/delete) -->
+        <app-realm-selector [mode]="'picker'" (realmSelected)="onRealmSelected($event)"></app-realm-selector>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h3 class="card-title">End-user login</h3></div>
+      <div class="card-body">
+        <app-login-panel [realm]="selectedRealm"></app-login-panel>
+        <div class="hint" *ngIf="!selectedRealm" style="margin-top:8px;">Select a realm above to log in.</div>
+      </div>
+    </div>
+  </ng-container>
+</div>

@@ -1,0 +1,147 @@
+<div class="login-panel">
+  <h3>Regular User Login</h3>
+
+  <div class="realm-hint">
+    <strong>Realm:</strong>
+    <span *ngIf="realmName; else noRealm">{{ realmName }}</span>
+    <ng-template #noRealm><em>none selected</em></ng-template>
+  </div>
+
+<!-- Success -->
+ 
+<div *ngIf="phase === 'success'" class="success-block">
+  <button (click)="doProtectedAction()">Run protected action</button>
+  <div class="info" *ngIf="info">{{ info }}</div>
+  <button (click)="logout()">Logout</button>
+</div>
+
+<!-- MFA selection -->
+<div *ngIf="phase === 'mfa-select'" class="mfa-block">
+  <p><strong>Choose your second factor:</strong></p>
+  <div class="mfa-grid">
+    <button class="mfa-option" (click)="chooseMfa('email')">
+      <div class="emoji">✉️</div>
+      <div>
+        <div class="title">Email code</div>
+        <div class="hint">Send a 6-digit code to your mailbox</div>
+      </div>
+    </button>
+
+    <button class="mfa-option" (click)="chooseMfa('totp')">
+      <div class="emoji">📱</div>
+      <div>
+        <div class="title">Google Authenticator</div>
+        <div class="hint">Use a 6-digit code from the app</div>
+      </div>
+    </button>
+
+    <button class="mfa-option" (click)="chooseMfa('msft_totp')">
+      <div class="emoji">🔒</div>
+      <div>
+        <div class="title">Microsoft Authenticator</div>
+        <div class="hint">Use a 6-digit code from the app</div>
+      </div>
+    </button>
+
+    <button class="mfa-option" *ngIf="allowed('sms')" (click)="chooseMfa('sms')">
+      <div class="emoji">📩</div>
+      <div><div class="title">SMS code</div><div class="hint">Send a 6-digit code to your phone</div></div>
+    </button>
+
+  </div>
+</div>
+
+
+  <!-- Credentials -->
+  <form *ngIf="phase === 'creds'" #f="ngForm" (ngSubmit)="onSubmit(f)">
+    <div class="form-row">
+      <label for="username">Username</label>
+      <input id="username" name="username" [(ngModel)]="username" required />
+    </div>
+
+    <div class="form-row">
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" [(ngModel)]="password" required />
+    </div>
+
+    <div class="actions">
+      <button type="submit" [disabled]="!realmName || f.invalid">Login</button>
+    </div>
+
+    <div *ngIf="loginError" class="error">{{ loginError }}</div>
+  </form>
+
+    <!-- EMAIL SETUP (missing email) -->
+  <div *ngIf="phase === 'email-setup'">
+    <p>We need an email on your account to continue. Enter it below:</p>
+    <div class="form-row">
+      <label>Email</label>
+      <input [(ngModel)]="emailInput" name="emailInput" type="email" />
+      <button (click)="saveEmail()">Save</button>
+    </div>
+    <div class="info" *ngIf="info">{{ info }}</div>
+    <div class="back-note"><em>Back</em>: <a href="#" (click)="$event.preventDefault(); phase='creds'">change credentials</a></div>
+  </div>
+
+  <!-- EMAIL VERIFY (email present but not verified) -->
+  <div *ngIf="phase === 'email-verify'">
+    <p>We sent you a verification email, or you can request one now:</p>
+    <button (click)="sendVerifyEmail()">Send verification email</button>
+    <div class="form-row">
+      <button (click)="checkVerified()">I verified my email</button>
+    </div>
+    <div class="info" *ngIf="info">{{ info }}</div>
+    <div class="back-note"><em>Back</em>: <a href="#" (click)="$event.preventDefault(); phase='creds'">change credentials</a></div>
+  </div>
+
+
+  <!-- EMAIL OTP -->
+  <div *ngIf="phase === 'mfa-email'" class="email-otp">
+    <button (click)="sendEmailCode()">Send code via Email</button>
+
+    <div class="otp-row">
+      <label>Code</label>
+      <input maxlength="6" [(ngModel)]="otp" name="emailOtp" />
+      <button (click)="verifyEmailCode()">Verify</button>
+    </div>
+    <div class="info" *ngIf="info">{{ info }}</div>
+  </div>
+
+  <!-- SMS OTP -->
+  <div *ngIf="phase === 'mfa-sms'" class="sms-otp">
+    <button (click)="sendSmsCode()" [disabled]="smsCooldownLeft>0">
+      {{ smsCooldownLeft>0 ? ('Resend in ' + smsCooldownLeft + 's') : 'Send SMS' }}
+    </button>
+    
+    <div class="otp-row">
+      <label>Code</label>
+      <input maxlength="6" [(ngModel)]="otp" name="smsOtp" />
+      <button (click)="verifySmsCode()">Verify</button>
+    </div>
+    <div class="info" *ngIf="info">{{ info }}</div>
+    <div class="back-note"><em>Back</em>: <a href="#" (click)="$event.preventDefault(); phase='mfa-select'">choose another method</a></div>
+  </div>
+
+  <!-- TOTP -->
+  <div *ngIf="phase === 'mfa-totp'" class="totp-block">
+    <p *ngIf="chosenMfa === 'totp'">
+      If you haven't set up <strong>Google Authenticator</strong>, click below:
+    </p>
+    <p *ngIf="chosenMfa === 'msft_totp'">
+      If you haven't set up <strong>Microsoft Authenticator</strong>, click below:
+    </p>
+    <button (click)="sendTotpEnroll()">Send setup link</button>
+    <p><em>Or set it up now, in this browser:</em></p>
+    <button (click)="startTotpInSession()">Set up now (in-session)</button>
+    <button (click)="checkOtpSetup()">I’ve set it up</button>
+    
+    <p>Then enter the 6-digit code from your app:</p>
+    <div class="otp-row">
+      <label>Code</label>
+      <input maxlength="6" [(ngModel)]="otp" name="totpCode" />
+      <button (click)="verifyTotp()">Verify</button>
+    </div>
+    <div class="info" *ngIf="info">{{ info }}</div>
+  </div>
+
+</div>

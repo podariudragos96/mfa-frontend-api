@@ -1,0 +1,71 @@
+<div class="user-list">
+  <div class="header-row" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+    <h3>Users in {{ realm.name }}</h3>
+    <div class="btn-group">
+      <button (click)="addUser()" class="btn primary small">Add User</button>
+      <button (click)="exportUsers()" class="btn small">Export JSON</button>
+    </div>
+  </div>
+
+  <div *ngIf="message" class="message">{{ message }}</div>
+
+  <app-user-form
+    *ngIf="editingUser"
+    [realm]="realm"
+    [user]="editingUser"
+    (saved)="onUserSaved($event)"
+    (cancel)="onUserFormCanceled()"
+  ></app-user-form>
+
+  <table *ngIf="users.length > 0; else noUsers">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Status</th>
+        <th class="actions-column">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td>{{ user.username }}</td>
+        <td>{{ user.email || '—' }}</td>
+        <td>
+          <ng-container *ngIf="user.email; else noEmail">
+            <span class="badge success" *ngIf="user.emailVerified">Verified</span>
+            <span class="badge warn" *ngIf="!user.emailVerified">Unverified</span>
+          </ng-container>
+          <ng-template #noEmail>
+            <span class="badge muted">No email</span>
+          </ng-template>
+        </td>
+        <td class="actions-column">
+          <div class="btn-group">
+            <button class="btn small ghost" (click)="editUser(user)">Edit</button>
+            <button class="btn small" (click)="resetPassword(user)" [disabled]="!user.email">
+              Reset
+            </button>
+             <button
+              class="btn small danger"
+              (click)="deleteUser(user)"
+              title="Delete user"
+            >
+              Delete
+            </button>
+            <button
+              class="btn small"
+              *ngIf="user.email && !user.emailVerified"
+              (click)="verifyEmail(user)"
+            >
+              Verify email
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ng-template #noUsers>
+    <p>No users found in this realm.</p>
+  </ng-template>
+</div>

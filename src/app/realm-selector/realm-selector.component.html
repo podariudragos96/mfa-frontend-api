@@ -1,0 +1,30 @@
+<div class="realm-selector">
+  <!-- Realm dropdown (shown in both modes) -->
+  <div class="row">
+    <label for="realmSelect">Realm</label>
+    <select id="realmSelect" (change)="onSelectRealm($event)">
+      <option value="" disabled [selected]="!selectedRealm">-- Select a Realm --</option>
+      <option *ngFor="let realm of realms" [value]="realm.id">{{ realm.name }}</option>
+    </select>
+    <button *ngIf="mode==='admin'" class="btn" (click)="refresh()">Refresh</button>
+  </div>
+
+  <!-- Admin-only create/delete UI -->
+  <div *ngIf="mode==='admin'">
+    <div class="divider"></div>
+    <h4>Create realm</h4>
+    <div class="row">
+      <label for="realmName">Realm name*</label>
+      <input id="realmName" [(ngModel)]="newRealmName" placeholder="e.g. demo-realm" />
+    </div>
+    <div class="row">
+      <label for="displayName">Display name</label>
+      <input id="displayName" [(ngModel)]="newDisplayName" placeholder="Shown in UI (optional)" />
+    </div>
+    <div class="row">
+      <button class="btn primary" (click)="createRealm()" [disabled]="!newRealmName.trim()">Create</button>
+      <button class="btn danger" (click)="deleteSelectedRealm()" [disabled]="!selectedRealm">Delete selected</button>
+      <span class="hint" *ngIf="message" style="margin-left:8px">{{ message }}</span>
+    </div>
+  </div>
+</div>
